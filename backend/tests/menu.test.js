@@ -77,4 +77,54 @@ describe('Menu API Routes', () => {
     expect(res.body.length).to.equal(1);
     expect(res.body[0]).to.have.property('name', 'Seed Pizza');
   });
+
+  describe('PUT /api/menu/:id', () => {
+    it('admin should update a menu item', async () => {
+      const adminToken = require('jsonwebtoken').sign({ id: 'admin123', role: 'admin' }, 'test-secret', { expiresIn: '1h' });
+      const category = await Category.create({ categoryName: 'Test' });
+      const item = await MenuItem.create({ 
+        name: 'Old', 
+        description: 'Test Desc',
+        price: 1, 
+        categoryId: category._id, 
+        type: 'veg', 
+        spicy: false, 
+        popular: false 
+      });
+
+      const res = await request(app)
+        .put(`/api/menu/${item._id}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ name: 'Updated' });
+
+      expect(res.statusCode).to.equal(200);
+      expect(res.body.menuItem).to.have.property('name', 'Updated');
+    });
+  });
+
+  describe('DELETE /api/menu/:id', () => {
+    it('admin should delete a menu item', async () => {
+      const adminToken = require('jsonwebtoken').sign({ id: 'admin123', role: 'admin' }, 'test-secret', { expiresIn: '1h' });
+      const category = await Category.create({ categoryName: 'Test' });
+      const item = await MenuItem.create({ 
+        name: 'Delete Me', 
+        description: 'Test Desc',
+        price: 1, 
+        categoryId: category._id, 
+        type: 'veg', 
+        spicy: false, 
+        popular: false 
+      });
+
+      const res = await request(app)
+        .delete(`/api/menu/${item._id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.statusCode).to.equal(200);
+      expect(res.body.message).to.equal('Menu item deleted successfully');
+
+      const dbItem = await MenuItem.findById(item._id);
+      expect(dbItem).to.be.null;
+    });
+  });
 });

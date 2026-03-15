@@ -98,4 +98,22 @@ describe('Auth API Routes', () => {
       expect(res.body).to.have.property('message', 'Invalid email or password');
     });
   });
+
+  describe('Validation', () => {
+    it('should return 400 for missing fields in registration', async () => {
+      const res = await request(app)
+        .post('/api/auth/register')
+        .send({ name: 'Test' });
+
+      expect(res.statusCode).to.equal(400);
+    });
+
+    it('should return 400 for missing fields in login', async () => {
+      const res = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'test@example.com' });
+
+      expect(res.statusCode).to.equal(400);
+    });
+  });
 });
