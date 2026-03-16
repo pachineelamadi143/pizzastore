@@ -3,6 +3,10 @@
 A full-stack Pizza Ordering Web Application built using the MERN Stack (MongoDB, Express.js, React.js, Node.js).
 The platform allows customers to browse pizzas, place orders, and track their order status while administrators manage menu items and orders.
 
+# 🌐 Live Demo
+🚀 **Live Application:**  
+https://pizza-store-156c4.web.app
+
 📌 Project Overview
 
 The Pizza Store Application provides an online platform where users can easily explore different pizza categories and place orders.
