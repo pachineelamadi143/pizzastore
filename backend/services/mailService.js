@@ -6,9 +6,12 @@ function createTransporter() {
       host: process.env.MAIL_HOST,
       port: Number(process.env.MAIL_PORT || 587),
       secure: process.env.MAIL_SECURE === 'true',
+      connectionTimeout: Number(process.env.MAIL_CONNECTION_TIMEOUT || 10000),
+      greetingTimeout: Number(process.env.MAIL_GREETING_TIMEOUT || 10000),
+      socketTimeout: Number(process.env.MAIL_SOCKET_TIMEOUT || 15000),
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        pass: process.env.MAIL_PASS.replace(/\s+/g, '')
       }
     });
   }
@@ -30,14 +33,32 @@ async function sendOtpEmail({ to, otp, purpose, name }) {
     text: `${intro}\n\nYour OTP is ${otp}.\nIt will expire in 10 minutes.\n\nIf you did not request this, you can ignore this email.`
   };
 
-  const info = await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
 
-  if (!process.env.MAIL_HOST || !process.env.MAIL_USER || !process.env.MAIL_PASS) {
-    console.log(`[MAIL PREVIEW] OTP for ${to}: ${otp}`);
-    console.log(info.message?.toString?.() || '');
+    if (!process.env.MAIL_HOST || !process.env.MAIL_USER || !process.env.MAIL_PASS) {
+      console.log(`[MAIL PREVIEW] OTP for ${to}: ${otp}`);
+      console.log(info.message?.toString?.() || '');
+    }
+
+    return info;
+  } catch (error) {
+    console.error('[MAIL] OTP email failed:', error.message);
+
+    if (!process.env.MAIL_HOST || !process.env.MAIL_USER || !process.env.MAIL_PASS) {
+      throw new Error('OTP email service is not configured on the server');
+    }
+
+    if (error.code === 'EAUTH') {
+      throw new Error('OTP email login failed. Check MAIL_USER and MAIL_PASS');
+    }
+
+    if (error.code === 'ETIMEDOUT' || error.code === 'ESOCKET' || error.code === 'ECONNECTION') {
+      throw new Error('OTP email service timed out. Please try again');
+    }
+
+    throw new Error('Unable to send OTP email right now');
   }
-
-  return info;
 }
 
 module.exports = { sendOtpEmail };
