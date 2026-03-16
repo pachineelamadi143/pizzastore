@@ -3,11 +3,8 @@ const { registerUser, loginUser, verifyRegisterOtp, verifyLoginOtp } = require('
 // REGISTER
 const register = async (req, res) => {
   try {
-    const result = await registerUser(req.body);
-    res.status(201).json({
-      message: 'OTP sent to your email',
-      ...result
-    });
+    await registerUser(req.body);
+    res.status(201).json({ message: 'Registered successfully. Please log in.' });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

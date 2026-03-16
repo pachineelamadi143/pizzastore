@@ -47,30 +47,28 @@ const registerUser = async (userData) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  let user = existingUser;
-  if (user) {
-    user.name = name;
-    user.password = hashedPassword;
-    user.phone = phone;
-    user.role = 'customer';
-    user.isVerified = false;
+  if (existingUser) {
+    existingUser.name = name;
+    existingUser.password = hashedPassword;
+    existingUser.phone = phone;
+    existingUser.role = 'customer';
+    existingUser.isVerified = true;
+    existingUser.otpCode = '';
+    existingUser.otpPurpose = '';
+    existingUser.otpExpiresAt = null;
+    await existingUser.save();
   } else {
-    user = await User.create({
+    await User.create({
       name,
       email,
       password: hashedPassword,
       phone,
       role: 'customer',
-      isVerified: false
+      isVerified: true
     });
   }
 
-  await assignOtp(user, 'register');
-
-  return {
-    requiresOtp: true,
-    email: user.email
-  };
+  return { registered: true };
 };
 
 const loginUser = async (email, password) => {

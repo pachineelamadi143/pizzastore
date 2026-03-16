@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { register, verifyRegisterOtp } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { register } from '../services/api';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
@@ -23,11 +22,8 @@ const registerSchema = Yup.object({
 
 const Register = () => {
   const [serverError, setServerError] = useState('');
-  const [otp, setOtp] = useState('');
-  const [otpStep, setOtpStep] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState('');
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
 
   const formik = useFormik({
     initialValues: { name: '', email: '', password: '', phone: '', role: 'customer' },
@@ -35,9 +31,9 @@ const Register = () => {
     onSubmit: async (values, { setSubmitting }) => {
       setServerError('');
       try {
-        const { data } = await register(values);
-        setPendingEmail(data.email || values.email);
-        setOtpStep(true);
+        await register(values);
+        setSuccess(true);
+        setTimeout(() => navigate('/login'), 2000);
       } catch (err) {
         setServerError(err.response?.data?.message || 'Registration failed');
       }
@@ -45,16 +41,6 @@ const Register = () => {
     },
   });
 
-  const handleVerifyOtp = async () => {
-    setServerError('');
-    try {
-      const { data } = await verifyRegisterOtp({ email: pendingEmail, otp });
-      authLogin(data.user, data.token);
-      navigate('/');
-    } catch (err) {
-      setServerError(err.response?.data?.message || 'OTP verification failed');
-    }
-  };
 
   const field = (name, label, type = 'text', placeholder = '') => (
     <Form.Group className="mb-3">
@@ -79,50 +65,26 @@ const Register = () => {
       <Card className="shadow-sm border-0 rounded-4" style={{ width: '430px', padding: '24px' }}>
         <h3 className="text-center mb-4">Pizza Store</h3>
         <p className="text-center text-danger fw-bold mb-2">Welcome to Pizza Store</p>
-        <h5 className="text-center mb-4">{otpStep ? 'Verify Your Email' : 'Register'}</h5>
+        <h5 className="text-center mb-4">Register</h5>
 
         {serverError && <Alert variant="danger">{serverError}</Alert>}
+        {success && <Alert variant="success">Registered successfully! Redirecting to login...</Alert>}
 
-        {otpStep ? (
-          <>
-            <p className="text-center text-muted mb-3">
-              Enter the OTP sent to your mail below.
-            </p>
-            <Form.Group className="mb-3">
-              <Form.Label>Enter OTP</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="6-digit OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              />
-            </Form.Group>
-            <Button
-              variant="danger"
-              className="w-100 rounded-pill fw-bold shadow-sm"
-              onClick={handleVerifyOtp}
-              disabled={otp.length !== 6}
-            >
-              Verify
-            </Button>
-          </>
-        ) : (
-          <Form noValidate onSubmit={formik.handleSubmit}>
-            {field('name',     'Full Name',     'text',     'Enter your name')}
-            {field('email',    'Email',         'email',    'Enter email')}
-            {field('password', 'Password',      'password', 'Min 6 characters')}
-            {field('phone',    'Phone Number',  'text',     '10-digit number')}
+        <Form noValidate onSubmit={formik.handleSubmit}>
+          {field('name',     'Full Name',     'text',     'Enter your name')}
+          {field('email',    'Email',         'email',    'Enter email')}
+          {field('password', 'Password',      'password', 'Min 6 characters')}
+          {field('phone',    'Phone Number',  'text',     '10-digit number')}
 
-            <Button
-              variant="danger"
-              type="submit"
-              className="w-100 rounded-pill fw-bold shadow-sm"
-              disabled={formik.isSubmitting}
-            >
-              {formik.isSubmitting ? 'Sending OTP...' : 'Register'}
-            </Button>
-          </Form>
-        )}
+          <Button
+            variant="danger"
+            type="submit"
+            className="w-100 rounded-pill fw-bold shadow-sm"
+            disabled={formik.isSubmitting || success}
+          >
+            {formik.isSubmitting ? 'Registering...' : 'Register'}
+          </Button>
+        </Form>
 
         <div className="text-center mt-3">
           <span className="text-muted">Already have an account? </span>
