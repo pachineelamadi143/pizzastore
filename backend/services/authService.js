@@ -1,78 +1,146 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { sendOtpEmail } = require('./mailService');
+
+const OTP_EXPIRY_MS = 10 * 60 * 1000;
+
+const serializeUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  profileImage: user.profileImage || ''
+});
+
+const generateToken = (user) => jwt.sign(
+  { id: user._id, role: user.role },
+  process.env.JWT_SECRET,
+  { expiresIn: '7d' }
+);
+
+const generateOtp = () => `${Math.floor(100000 + Math.random() * 900000)}`;
+
+const assignOtp = async (user, purpose) => {
+  const otp = generateOtp();
+  user.otpCode = otp;
+  user.otpPurpose = purpose;
+  user.otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
+  await user.save();
+
+  await sendOtpEmail({
+    to: user.email,
+    otp,
+    purpose,
+    name: user.name
+  });
+};
 
 const registerUser = async (userData) => {
-  const { name, email, password, phone, role } = userData;
+  const { name, email, password, phone } = userData;
 
-  // Check if user already exists
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
+  if (existingUser && existingUser.isVerified) {
     throw new Error('User already exists');
   }
 
-  // Encrypt password
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  // Create user
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    phone,
-    role: role || 'customer'
-  });
+  let user = existingUser;
+  if (user) {
+    user.name = name;
+    user.password = hashedPassword;
+    user.phone = phone;
+    user.role = 'customer';
+    user.isVerified = false;
+  } else {
+    user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      phone,
+      role: 'customer',
+      isVerified: false
+    });
+  }
 
-  // Generate token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  await assignOtp(user, 'register');
 
   return {
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      profileImage: user.profileImage || ''
-    }
+    requiresOtp: true,
+    email: user.email
   };
 };
 
 const loginUser = async (email, password) => {
-  // Check if user exists
   const user = await User.findOne({ email });
   if (!user) {
     throw new Error('Invalid email or password');
   }
 
-  // Check password
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     throw new Error('Invalid email or password');
   }
 
-  // Generate token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  if (!user.isVerified) {
+    throw new Error('Please verify your email before logging in');
+  }
+
+  await assignOtp(user, 'login');
 
   return {
-    token,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      profileImage: user.profileImage || ''
-    }
+    requiresOtp: true,
+    email: user.email
   };
 };
 
-module.exports = { registerUser, loginUser };
+const verifyRegisterOtp = async (email, otp) => {
+  const user = await User.findOne({ email });
+  if (!user || user.otpPurpose !== 'register') {
+    throw new Error('Invalid OTP request');
+  }
+  if (!user.otpExpiresAt || user.otpExpiresAt.getTime() < Date.now()) {
+    throw new Error('OTP has expired');
+  }
+  if (user.otpCode !== otp) {
+    throw new Error('Invalid OTP');
+  }
+
+  user.isVerified = true;
+  user.otpCode = '';
+  user.otpPurpose = '';
+  user.otpExpiresAt = null;
+  await user.save();
+
+  return {
+    token: generateToken(user),
+    user: serializeUser(user)
+  };
+};
+
+const verifyLoginOtp = async (email, otp) => {
+  const user = await User.findOne({ email });
+  if (!user || user.otpPurpose !== 'login') {
+    throw new Error('Invalid OTP request');
+  }
+  if (!user.otpExpiresAt || user.otpExpiresAt.getTime() < Date.now()) {
+    throw new Error('OTP has expired');
+  }
+  if (user.otpCode !== otp) {
+    throw new Error('Invalid OTP');
+  }
+
+  user.otpCode = '';
+  user.otpPurpose = '';
+  user.otpExpiresAt = null;
+  await user.save();
+
+  return {
+    token: generateToken(user),
+    user: serializeUser(user)
+  };
+};
+
+module.exports = { registerUser, loginUser, verifyRegisterOtp, verifyLoginOtp };

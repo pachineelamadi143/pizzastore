@@ -13,7 +13,9 @@ API.interceptors.request.use((req) => {
 
 // Auth & Users
 export const register = (data) => API.post('/auth/register', data);
+export const verifyRegisterOtp = (data) => API.post('/auth/register/verify', data);
 export const login = (data) => API.post('/auth/login', data);
+export const verifyLoginOtp = (data) => API.post('/auth/login/verify', data);
 export const logout = () => API.post('/auth/logout');
 export const getProfile = () => API.get('/users/profile');
 export const updateProfile = (data) => API.put('/users/profile', data);
