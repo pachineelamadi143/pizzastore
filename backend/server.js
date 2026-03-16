@@ -39,11 +39,13 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/address', require('./routes/addressRoutes'));
 
 // Create HTTP server and attach WebSocket server
-const PORT = process.env.PORT || 5000;
+
 const server = http.createServer(app);
 
 const wss = new WebSocketServer({ server });
 initWebSocket(wss);
+
+const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
