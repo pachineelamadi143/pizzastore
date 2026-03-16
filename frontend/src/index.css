@@ -1,0 +1,181 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom UI Enhancements */
+
+.tracking-wider {
+  letter-spacing: 0.1em;
+}
+
+.hover-scale {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+}
+
+.hover-zoom {
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .hover-zoom {
+  transform: scale(1.1);
+}
+
+.hover-white:hover {
+  color: white !important;
+  opacity: 1 !important;
+  transition: all 0.3s ease;
+}
+
+/* Make sure the carousel control icons are distinct */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 20px;
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+
+/* Orders Table Styles */
+.orders-table {
+  vertical-align: middle;
+}
+.orders-table thead th {
+  background-color: #212529;
+  color: #fff;
+  font-weight: 500;
+  border: none;
+  padding: 1.25rem 1rem;
+}
+.orders-table tbody td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+.order-id-text {
+  color: #c2185b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+
+/* Notification Styles */
+.notification-card {
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eaeaea;
+  background-color: #fcfcfc;
+}
+.notification-id {
+  font-weight: 700;
+  color: #333;
+}
+.notification-title {
+  color: #888;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+.notification-status {
+  background-color: #212529;
+  color: white;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.notification-body {
+  padding: 0;
+}
+.notification-step {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid #f5f5f5;
+}
+.notification-step:last-child {
+  border-bottom: none;
+}
+.notification-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+.icon-delivered {
+  background-color: #e6f6eb;
+  color: #28a745;
+}
+.icon-delivery {
+  background-color: #fde8ed;
+  color: #dc3545;
+}
+.icon-prep {
+  background-color: #f0f0fa;
+  color: #6610f2;
+}
+.notification-content h6 {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+.notification-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #888;
+}
+.notification-dropdown-menu {
+  width: 450px;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+}
+.notification-main-header {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 0 5px;
+}
+.notification-main-header i {
+  color: #fbbf24;
+}

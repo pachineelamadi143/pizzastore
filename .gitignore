@@ -43,6 +43,7 @@ coverage/
 # Firebase cache
 
 .firebase/
+/frontend/.git-standalone-backup/
 
 # Render build cache
 
