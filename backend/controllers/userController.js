@@ -73,14 +73,39 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// Get all users (Admin only - Customers only)
+// Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: 'customer' }).select('-password');
+    const users = await User.find({}).select('-password');
     res.json(users);
   } catch (error) {
     console.error('Error fetching all users:', error);
     res.status(500).json({ message: 'Server error while fetching users' });
+  }
+};
+
+// Update user role (Admin only)
+exports.updateUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!['customer', 'admin'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role' });
+    }
+    
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true, runValidators: true }
+    ).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    res.json({ message: 'User role updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user role:', error);
+    res.status(500).json({ message: 'Server error while updating user role' });
   }
 };
 
