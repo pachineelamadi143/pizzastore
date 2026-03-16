@@ -6,9 +6,6 @@ function createTransporter() {
       host: process.env.MAIL_HOST,
       port: Number(process.env.MAIL_PORT || 587),
       secure: process.env.MAIL_SECURE === 'true',
-      connectionTimeout: Number(process.env.MAIL_CONNECTION_TIMEOUT || 10000),
-      greetingTimeout: Number(process.env.MAIL_GREETING_TIMEOUT || 10000),
-      socketTimeout: Number(process.env.MAIL_SOCKET_TIMEOUT || 15000),
       auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS.replace(/\s+/g, '')
