@@ -114,19 +114,19 @@ const Orders = () => {
     doc.setFontSize(11);
     doc.setTextColor(50);
     
-    doc.text(`Subtotal:`, 140, finalY);
-    doc.text(`Rs. ${order.subtotal || order.totalAmount}`, 175, finalY, { align: 'right' });
+    doc.text(`Subtotal:`, 120, finalY);
+    doc.text(`Rs. ${order.subtotal || order.totalAmount}`, 190, finalY, { align: 'right' });
     
-    doc.text(`Tax (5%):`, 140, finalY + 7);
-    doc.text(`Rs. ${order.tax || 0}`, 175, finalY + 7, { align: 'right' });
+    doc.text(`Tax (5%):`, 120, finalY + 7);
+    doc.text(`Rs. ${order.tax || 0}`, 190, finalY + 7, { align: 'right' });
     
-    doc.text(`Delivery:`, 140, finalY + 14);
-    doc.text(`Rs. ${order.deliveryCharge || 0}`, 175, finalY + 14, { align: 'right' });
+    doc.text(`Delivery:`, 120, finalY + 14);
+    doc.text(`Rs. ${order.deliveryCharge || 0}`, 190, finalY + 14, { align: 'right' });
     
     doc.setFontSize(14);
     doc.setFont(undefined, 'bold');
-    doc.text(`TOTAL BILL:`, 140, finalY + 25);
-    doc.text(`Rs. ${order.totalAmount}`, 175, finalY + 25, { align: 'right' });
+    doc.text(`TOTAL BILL:`, 120, finalY + 25);
+    doc.text(`Rs. ${order.totalAmount}`, 190, finalY + 25, { align: 'right' });
 
     // Footer
     doc.setFontSize(10);
