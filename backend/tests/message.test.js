@@ -13,12 +13,8 @@ describe('Message API Routes', () => {
   let userId = '507f1f77bcf86cd799439011';
   let orderId = '507f1f77bcf86cd799439012';
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     adminToken = jwt.sign({ id: 'admin123', role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
     userToken = jwt.sign({ id: userId, role: 'customer' }, process.env.JWT_SECRET, { expiresIn: '1h' });
   });

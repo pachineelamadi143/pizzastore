@@ -78,7 +78,18 @@ const Navbar = ({ transparent = false }) => {
 
       {/* Mobile collapse – visible below lg */}
       <Collapse in={menuOpen}>
-        <div id="navbarMenu" className="d-lg-none w-100 pt-2 pb-3">
+        <div 
+          id="navbarMenu" 
+          className="d-lg-none position-absolute end-0 mt-2 p-3 shadow-lg"
+          style={{
+            backgroundColor: 'white',
+            borderRadius: '15px',
+            width: '200px',
+            zIndex: 1050,
+            top: '100%',
+            marginRight: '1rem'
+          }}
+        >
           <div className="d-flex flex-column gap-2">
             {renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, handleLogout, true, userMenuOpen, setUserMenuOpen)}
           </div>
@@ -90,16 +101,22 @@ const Navbar = ({ transparent = false }) => {
 
 /* ── Shared link renderer for both desktop & mobile ────────────── */
 function renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, handleLogout, mobile = false, userMenuOpen, setUserMenuOpen) {
-  const btn = (label, path, variant = 'outline-light', id) => (
-    <button
-      key={path}
-      id={id || `nav-${label.toLowerCase().replace(/\s/g, '-')}`}
-      className={`btn btn-sm btn-${variant} rounded-pill px-3 ${mobile ? 'w-100 text-start' : ''}`}
-      onClick={() => go(path)}
-    >
-      {label}
-    </button>
-  );
+  const btn = (label, path, variant = 'outline-light', id) => {
+    // For mobile (which now has white background), use red outline instead of light outline
+    const finalVariant = mobile ? 'outline-danger' : variant;
+    
+    return (
+      <button
+        key={path}
+        id={id || `nav-${label.toLowerCase().replace(/\s/g, '-')}`}
+        className={`btn btn-sm btn-${finalVariant} rounded-pill px-3 ${mobile ? 'w-100 text-start border-0' : ''}`}
+        onClick={() => go(path)}
+        style={mobile ? { color: '#dc3545', fontWeight: '500' } : {}}
+      >
+        {label}
+      </button>
+    );
+  };
 
   if (user) {
     return (
@@ -110,15 +127,16 @@ function renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, 
           </span>
         )}
         {mobile && (
-          <span className="text-white fw-medium px-2 small">Hello, {user.name}!</span>
+          <span className="text-dark fw-bold px-2 mb-2 small border-bottom pb-2">Hello, {user.name}!</span>
         )}
 
         {user.role === 'admin' ? (
           <>
             <button
               id="nav-dashboard"
-              className={`btn btn-sm btn-outline-light rounded-pill px-3 position-relative ${mobile ? 'w-100 text-start' : ''}`}
+              className={`btn btn-sm btn-${mobile ? 'outline-danger' : 'outline-light'} rounded-pill px-3 position-relative ${mobile ? 'w-100 text-start border-0' : ''}`}
               onClick={() => { resetAdminUnread(); go('/admin'); }}
+              style={mobile ? { color: '#dc3545', fontWeight: '500' } : {}}
             >
               Dashboard
               {adminUnreadCount > 0 && (
@@ -146,8 +164,9 @@ function renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, 
             {btn('My Orders', '/orders', 'outline-light', 'nav-orders')}
             <button
               id="nav-notifications"
-              className={`btn btn-sm btn-outline-light rounded-pill px-3 position-relative ${mobile ? 'w-100 text-start' : ''}`}
+              className={`btn btn-sm btn-${mobile ? 'outline-danger' : 'outline-light'} rounded-pill px-3 position-relative ${mobile ? 'w-100 text-start border-0' : ''}`}
               onClick={() => go('/notifications')}
+              style={mobile ? { color: '#dc3545', fontWeight: '500' } : {}}
             >
               Notifications
               {unreadCount > 0 && (
@@ -177,16 +196,17 @@ function renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, 
               <img
                 src={user.profileImage}
                 alt={user.name || 'Profile'}
-                className="rounded-circle border border-white"
+                className={`rounded-circle border ${mobile ? 'border-danger' : 'border-white'}`}
                 style={{ width: '32px', height: '32px', objectFit: 'cover' }}
               />
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" className="bi bi-person-circle" viewBox="0 0 16 16">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill={mobile ? '#dc3545' : 'currentColor'} className="bi bi-person-circle" viewBox="0 0 16 16">
                 <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
                 <path fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
               </svg>
             )}
             {!mobile && <i className={`bi bi-chevron-${userMenuOpen ? 'up' : 'down'} ms-1 small`}></i>}
+            {mobile && <span className="ms-2 fw-medium text-dark small">Profile & Account</span>}
           </button>
 
           {/* Actual Dropdown Menu */}
@@ -233,14 +253,15 @@ function renderLinks(user, unreadCount, adminUnreadCount, resetAdminUnread, go, 
       {btn('Menu', '/menu', 'outline-light', 'nav-menu-guest')}
       <button
         id="nav-login"
-        className={`btn btn-sm btn-light rounded-pill px-4 text-danger fw-bold ${mobile ? 'w-100' : ''}`}
+        className={`btn btn-sm btn-${mobile ? 'outline-danger' : 'light'} rounded-pill px-4 ${mobile ? 'text-start border-0' : 'text-danger fw-bold'} ${mobile ? 'w-100' : ''}`}
         onClick={() => go('/login')}
+        style={mobile ? { color: '#dc3545', fontWeight: 'bold' } : {}}
       >
         Login
       </button>
       <button
         id="nav-register"
-        className={`btn btn-sm btn-danger rounded-pill px-4 border-light ${mobile ? 'w-100' : ''}`}
+        className={`btn btn-sm btn-danger rounded-pill px-4 border-light ${mobile ? 'w-100 text-start mt-1' : ''}`}
         onClick={() => go('/register')}
       >
         Register

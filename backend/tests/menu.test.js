@@ -7,10 +7,6 @@ const Category = require('../models/Category');
 
 process.env.JWT_SECRET = 'test-secret';
 
-afterEach(async () => {
-  await db.clearDatabase();
-});
-
 describe('Menu API Routes', () => {
   it('GET /api/menu should return empty array when no items exist', async () => {
     const res = await request(app).get('/api/menu');

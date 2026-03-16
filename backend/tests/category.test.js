@@ -11,12 +11,8 @@ describe('Category API Routes', () => {
   let adminToken;
   let userToken;
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     
     adminToken = jwt.sign({ id: 'admin123', role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
     userToken = jwt.sign({ id: 'user123', role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });

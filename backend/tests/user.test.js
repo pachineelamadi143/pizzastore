@@ -14,12 +14,8 @@ describe('User API Routes', () => {
   let userId;
   let user;
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     
     // Create a regular user
     const salt = await bcrypt.genSalt(10);

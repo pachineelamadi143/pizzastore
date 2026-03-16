@@ -7,10 +7,6 @@ const User = require('../models/User');
 // Set process.env overrides
 process.env.JWT_SECRET = 'test-secret';
 
-afterEach(async () => {
-  await db.clearDatabase();
-});
-
 describe('Auth API Routes', () => {
   describe('POST /api/auth/register', () => {
     it('should successfully register a new user', async () => {
@@ -24,9 +20,7 @@ describe('Auth API Routes', () => {
         });
 
       expect(res.statusCode).to.equal(201);
-      expect(res.body).to.have.property('token');
-      expect(res.body.user).to.have.property('name', 'Test Tester');
-      expect(res.body.user).to.have.property('email', 'test@example.com');
+      expect(res.body.message).to.equal('Registered successfully. Please log in.');
       
       const dbUser = await User.findOne({ email: 'test@example.com' });
       expect(dbUser).to.not.be.null;

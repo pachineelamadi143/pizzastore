@@ -17,12 +17,8 @@ describe('Order API Routes', () => {
   let addressId;
   let menuItemId;
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     
     adminToken = jwt.sign({ id: 'admin123', role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1h' });
     userToken = jwt.sign({ id: userId, role: 'customer' }, process.env.JWT_SECRET, { expiresIn: '1h' });

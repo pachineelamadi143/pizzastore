@@ -6,5 +6,8 @@ exports.mochaHooks = {
   },
   async afterAll() {
     await db.closeDatabase();
+  },
+  async afterEach() {
+    await db.clearDatabase();
   }
 };

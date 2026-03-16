@@ -14,12 +14,8 @@ describe('Cart API Routes', () => {
   let userId = '507f1f77bcf86cd799439011'; // Mock ObjectId
   let menuItem;
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     
     // Create a mock user token
     userToken = jwt.sign({ id: userId, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });

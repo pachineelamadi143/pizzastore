@@ -13,12 +13,8 @@ describe('Payment API Routes', () => {
   let userId = '507f1f77bcf86cd799439011';
   let orderId;
 
-  before(async () => {
-    await db.connect();
-  });
 
   beforeEach(async () => {
-    await db.clearDatabase();
     userToken = jwt.sign({ id: userId, role: 'customer' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     // Create an order for payment testing
