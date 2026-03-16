@@ -28,12 +28,11 @@ const assignOtp = async (user, purpose) => {
   user.otpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MS);
   await user.save();
 
-  await sendOtpEmail({
-    to: user.email,
-    otp,
-    purpose,
-    name: user.name
-  });
+  // Send email in background — do NOT await so the response is immediate
+  console.log(`[OTP] ${purpose} OTP for ${user.email}: ${otp}`);
+  sendOtpEmail({ to: user.email, otp, purpose, name: user.name })
+    .then(() => console.log(`[MAIL] OTP email sent to ${user.email}`))
+    .catch((err) => console.error(`[MAIL] Failed to send OTP email to ${user.email}:`, err.message));
 };
 
 const registerUser = async (userData) => {
